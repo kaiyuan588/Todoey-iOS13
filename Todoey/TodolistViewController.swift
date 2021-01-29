@@ -9,12 +9,11 @@
 import UIKit
 
 class TodolistViewController: UITableViewController {
-
+    let itemArray = ["Skateboarding", "Onewheeling", "Snowboarding"]
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
     }
-
+    
 
 }
 
