@@ -10,11 +10,17 @@ import UIKit
 
 class TodolistViewController: UITableViewController {
     
-    var itemArray = ["Skateboarding", "Onewheeling", "Snowboarding"]
+    var itemArray = [Item]()
     
     @IBOutlet weak var addBtn: UIBarButtonItem!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let newItem = Item()
+        newItem.title = "Skateboarding"
+        itemArray.append(newItem)
+        
     }
     
     //MARK - Tableview Datasource method
@@ -25,8 +31,15 @@ class TodolistViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath)
+        let item = itemArray[indexPath.row]
         
-        cell.textLabel?.text = itemArray[indexPath.row]
+        cell.textLabel?.text = item.title
+        
+        if item.done == true {
+            cell.accessoryType = .checkmark
+        }else {
+            cell.accessoryType = .none
+        }
         
         return cell
     }
@@ -35,12 +48,8 @@ class TodolistViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none 
-        }else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }
+        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -51,7 +60,9 @@ class TodolistViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             //what will happened once user clicked
             if let text = textField.text {
-                self.itemArray.append(text)
+                let newItem = Item()
+                newItem.title = text
+                self.itemArray.append(newItem)
                 self.tableView.reloadData()
             }
         }
