@@ -11,6 +11,7 @@ import UIKit
 class TodolistViewController: UITableViewController {
     
     var itemArray = [Item]()
+    let userDefault = UserDefaults.standard
     
     @IBOutlet weak var addBtn: UIBarButtonItem!
     
@@ -20,6 +21,10 @@ class TodolistViewController: UITableViewController {
         let newItem = Item()
         newItem.title = "Skateboarding"
         itemArray.append(newItem)
+        
+        if let items = userDefault.array(forKey: "StoredArray") as? [Item] {
+            itemArray = items
+        }
         
     }
     
@@ -35,12 +40,14 @@ class TodolistViewController: UITableViewController {
         
         cell.textLabel?.text = item.title
         
-        if item.done == true {
-            cell.accessoryType = .checkmark
-        }else {
-            cell.accessoryType = .none
-        }
+        cell.accessoryType = item.done ? .checkmark : .none
         
+//        if item.done == true {
+//            cell.accessoryType = .checkmark
+//        }else {
+//            cell.accessoryType = .none
+//        }
+
         return cell
     }
     
@@ -63,6 +70,7 @@ class TodolistViewController: UITableViewController {
                 let newItem = Item()
                 newItem.title = text
                 self.itemArray.append(newItem)
+                self.userDefault.set(self.itemArray, forKey: "StoredArray")
                 self.tableView.reloadData()
             }
         }
