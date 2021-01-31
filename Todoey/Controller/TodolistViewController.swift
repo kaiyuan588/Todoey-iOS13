@@ -7,12 +7,13 @@
 //
 
 import UIKit
-
+import CoreData
 class TodolistViewController: UITableViewController {
     
     var itemArray = [Item]()
 //    let userDefault = UserDefaults.standard
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     @IBOutlet weak var addBtn: UIBarButtonItem!
     
     override func viewDidLoad() {
@@ -62,14 +63,20 @@ class TodolistViewController: UITableViewController {
         let alert = UIAlertController(title: "Add New To Do Item", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             //what will happened once user clicked
-            if let text = textField.text {
-                let newItem = Item()
-                newItem.title = text
-                self.itemArray.append(newItem)
-//                self.userDefault.set(self.itemArray, forKey: "StoredArray")
-                self.saveItems()
-               
-            }
+//            if let text = textField.text {
+//                let newItem = Item()
+//                newItem.title = text
+//                self.itemArray.append(newItem)
+////                self.userDefault.set(self.itemArray, forKey: "StoredArray")
+//                self.saveItems()
+//
+//            }
+            
+            let newItem = Item(context: self.context)
+            newItem.title = textField.text
+            newItem.done = false
+            self.itemArray.append(newItem)
+            self.saveItems()
         }
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create new item"
@@ -80,24 +87,37 @@ class TodolistViewController: UITableViewController {
     }
     
     func saveItems(){
-        let encoder = PropertyListEncoder()
+//        let encoder = PropertyListEncoder()
+//        do {
+//            let data = try encoder.encode(self.itemArray)
+//            try data.write(to: self.dataFilePath!)
+//        }catch {
+//            print("error\(error)")
+//
+//        }
         do {
-            let data = try encoder.encode(self.itemArray)
-            try data.write(to: self.dataFilePath!)
+            try context.save()
         }catch {
-            print("error\(error)")
-            
+            print("error save context\(error)")
         }
         self.tableView.reloadData()
     }
     func loadItems(){
-        if let data = try? Data(contentsOf: dataFilePath!) {
-            let decoder = PropertyListDecoder()
-            do {
-                itemArray = try decoder.decode([Item].self, from: data)
-            }catch {
-                print("Error\(error)")
-            }
+//        if let data = try? Data(contentsOf: dataFilePath!) {
+//            let decoder = PropertyListDecoder()
+//            do {
+//                itemArray = try decoder.decode([Item].self, from: data)
+//            }catch {
+//                print("Error\(error)")
+//            }
+//        }
+        
+        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        do {
+            itemArray = try context.fetch(request)
+        }catch{
+            print("There are errors\(error)")
         }
+        
     }
 }
