@@ -121,3 +121,13 @@ class TodolistViewController: UITableViewController {
         
     }
 }
+
+//MARK: - Searchbar methods
+
+extension TodolistViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        let predicate = NSPredicate(format: "title CONTAINS %@", searchBar.text!)
+    }
+}
