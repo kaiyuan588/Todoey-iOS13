@@ -11,7 +11,8 @@ import CoreData
 class TodolistViewController: UITableViewController {
     
     var itemArray = [Item]()
-//    let userDefault = UserDefaults.standard
+    @IBOutlet weak var searchBar: UISearchBar!
+    //    let userDefault = UserDefaults.standard
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     @IBOutlet weak var addBtn: UIBarButtonItem!
@@ -19,6 +20,7 @@ class TodolistViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadItems()
+        searchBar.delegate = self
 //        if let items = userDefault.array(forKey: "StoredArray") as? [Item] {
 //            itemArray = items
 //        }
