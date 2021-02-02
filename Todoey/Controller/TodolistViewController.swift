@@ -110,7 +110,7 @@ class TodolistViewController: UITableViewController {
         }
         self.tableView.reloadData()
     }
-    func loadItems(){
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil){
 //        if let data = try? Data(contentsOf: dataFilePath!) {
 //            let decoder = PropertyListDecoder()
 //            do {
@@ -119,8 +119,15 @@ class TodolistViewController: UITableViewController {
 //                print("Error\(error)")
 //            }
 //        }
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
         
-        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        
+        if let additionalPredicate = predicate {
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
+        }else {
+            request.predicate = categoryPredicate
+        }
+        
         do {
             itemArray = try context.fetch(request)
         }catch{
@@ -136,19 +143,13 @@ extension TodolistViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         let request : NSFetchRequest<Item> = Item.fetchRequest()
-        let predicate = NSPredicate(format: "title CONTAINS %@", searchBar.text!)
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
         
         request.predicate = predicate
         let sortDescriptor = NSSortDescriptor(key: "title", ascending: true)
         
         request.sortDescriptors = [sortDescriptor]
-        
-        do {
-            itemArray = try context.fetch(request)
-        }catch{
-            print("There are errors\(error)")
-        }
-        tableView.reloadData()
+        loadItems(with: request, predicate: predicate)
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
